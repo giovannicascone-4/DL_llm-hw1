@@ -1,0 +1,19 @@
+# HW1 part 1b: loss of an (almost) UNTRAINED model for several tokenizers, compared with ln V.
+# max_steps=1 = one optimizer step at warm-up LR (1/100 of the peak) -> the weights are essentially the init.
+# Same modern char Transformer as L3_tokenizer; only the tokenizer changes.
+name: hw1_untrained
+base: ../../DeepDataMiningLearning/DeepDataMiningLearning/llm/nanolm/configs/laptop/L3_tokenizer.yaml
+seeds: [1337, 42]
+common:
+  train.max_steps: 1
+  train.eval_every: 0
+  eval.sample_tokens: 0
+runs:
+  - name: char            # V = 65
+    overrides: {data.tokenizer: char}
+  - name: byte            # V = 256
+    overrides: {data.tokenizer: byte}
+  - name: bpe_512         # SentencePiece BPE trained on the train split, V = 512
+    overrides: {data.tokenizer: "sp_train:bpe:512"}
+  - name: word_2048       # word-level, V = 2048
+    overrides: {data.tokenizer: "word:2048"}

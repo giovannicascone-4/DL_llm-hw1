@@ -1,0 +1,25 @@
+# HW1 part 3: context length. LSTM 2x256 and the modern Transformer at train.seq_len = 64, 128, 512.
+# seq_len = 256 is NOT repeated here: it is exactly the 'lstm' and 'gpt_modern' runs of hw1_char_models
+# (same config, same seeds), and scripts/plot_context.py reads them from there.
+# Token budget held fixed: batch_size x seq_len = 8192 tokens/step for every run, same max_steps.
+# Evaluation uses windows of length seq_len (eval.eval_seq_len = 0), so a token is predicted from
+# 0..seq_len-1 tokens of context (avg ~seq_len/2): the model is tested at the context it was trained for.
+name: hw1_context
+base: ../../DeepDataMiningLearning/DeepDataMiningLearning/llm/nanolm/configs/02_char_transformer.yaml
+seeds: [1337, 42]
+common:
+  train.max_steps: 2000
+  train.eval_every: 100
+runs:
+  - name: lstm_ctx64
+    overrides: {model.arch: lstm, model.n_layers: 2, model.dim: 256, train.lr: 2e-3, train.weight_decay: 0.0, train.seq_len: 64, train.batch_size: 128}
+  - name: lstm_ctx128
+    overrides: {model.arch: lstm, model.n_layers: 2, model.dim: 256, train.lr: 2e-3, train.weight_decay: 0.0, train.seq_len: 128, train.batch_size: 64}
+  - name: lstm_ctx512
+    overrides: {model.arch: lstm, model.n_layers: 2, model.dim: 256, train.lr: 2e-3, train.weight_decay: 0.0, train.seq_len: 512, train.batch_size: 16}
+  - name: gpt_ctx64
+    overrides: {model.norm: rmsnorm, model.pos: rope, model.mlp: swiglu, model.bias: false, train.seq_len: 64, train.batch_size: 128}
+  - name: gpt_ctx128
+    overrides: {model.norm: rmsnorm, model.pos: rope, model.mlp: swiglu, model.bias: false, train.seq_len: 128, train.batch_size: 64}
+  - name: gpt_ctx512
+    overrides: {model.norm: rmsnorm, model.pos: rope, model.mlp: swiglu, model.bias: false, train.seq_len: 512, train.batch_size: 16}
