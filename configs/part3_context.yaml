@@ -1,4 +1,4 @@
-# Part 3: LSTM and modern Transformer at seq_len 64/128/512 (batch x seq_len = 8192). seq_len 256 = the runs in hw1_char_models.
+# Part 3: LSTM and modern Transformer at seq_len 64, 128, 512 (seq_len 256 = the runs in part2_models.yaml).
 name: hw1_context
 base: ../../DeepDataMiningLearning/DeepDataMiningLearning/llm/nanolm/configs/02_char_transformer.yaml
 seeds: [1337, 42]
