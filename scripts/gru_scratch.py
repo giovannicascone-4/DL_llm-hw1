@@ -1,18 +1,4 @@
-"""HW1 extra credit: a GRU cell written gate by gate (like nanolm's LSTMScratch), checked against nn.GRU.
-
-    python hw1/scripts/gru_scratch.py [--out results/extra_gru_check.txt]
-
-PyTorch's GRU (the convention we must match exactly, see torch.nn.GRU docs):
-    r  = sigma(W_ir x + b_ir + W_hr h + b_hr)          reset gate
-    z  = sigma(W_iz x + b_iz + W_hz h + b_hz)          update gate
-    n  = tanh (W_in x + b_in + r * (W_hn h + b_hn))    candidate; r gates the *projected* h, bias included
-    h' = (1 - z) * n + z * h
-Because r multiplies (W_hn h + b_hn), the input and hidden projections must be kept separate
-(unlike LSTMScratch, which uses one Linear on [x, h]).
-
-Checks: forward outputs and final hidden state, multi-layer stacks, and the gradients of every
-weight, in float64 so that agreement down to ~1e-12 is expected.
-"""
+"""Extra credit: GRU cell written gate by gate, checked against nn.GRU (outputs and gradients)."""
 from __future__ import annotations
 
 import argparse

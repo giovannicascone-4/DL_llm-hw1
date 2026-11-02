@@ -1,13 +1,4 @@
-"""HW1 part 2 (question: is the larger LSTM better or worse, and what in your curves shows why?)
-
-Train loss vs validation loss, both in nats/char, against training tokens, one panel per model.
-A widening gap with val loss turning UP = overfitting (memorizing the 1 MB corpus).
-
-    python ../../../hw1/scripts/plot_train_val.py outputs/nanolm/sweeps/hw1_char_models --out-dir results/part2
-
-Note: train loss is measured with dropout on, so a small train > val gap early on is normal.
-Writes train_vs_val.png and best_vs_final.md (step of the best periodic val bpb vs the final one).
-"""
+"""Part 2: training vs. validation loss for each model (train_vs_val.png)."""
 from __future__ import annotations
 
 import argparse
@@ -69,20 +60,7 @@ def main():
     fig.savefig(out / "train_vs_val.png", dpi=150)
     plt.close(fig)
 
-    lines = ["| model | seed | best periodic val bpb | at tokens (M) | final periodic val bpb | final - best | "
-             "last train loss | last val loss | gap (val - train) |", "|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
-    for n in names:
-        for s in sorted(ev[ev.name == n].seed.unique()):
-            e = ev[(ev.name == n) & (ev.seed == s)].sort_values("tokens")
-            t = tr[(tr.name == n) & (tr.seed == s)].sort_values("tokens")
-            b = e.loc[e.bpb.idxmin()]
-            f = e.iloc[-1]
-            lt = t.loss.iloc[-3:].mean() if len(t) else float("nan")      # average of the last 3 logged train losses
-            lines.append(f"| {n} | {s} | {b.bpb:.4f} | {b.tokens / 1e6:.1f} | {f.bpb:.4f} | {f.bpb - b.bpb:+.4f} | "
-                         f"{lt:.3f} | {f.loss:.3f} | {f.loss - lt:+.3f} |")
-    (out / "best_vs_final.md").write_text("\n".join(lines) + "\n")
-    print("\n".join(lines))
-    print(f"\nwrote {out}/train_vs_val.png, best_vs_final.md")
+    print(f"wrote {out}/train_vs_val.png")
 
 
 if __name__ == "__main__":

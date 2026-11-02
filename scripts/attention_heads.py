@@ -1,25 +1,5 @@
-"""HW1 part 4: attention maps on three kinds of text + one number per head and pattern (as in §1.6.2).
-
-    python ../../../hw1/scripts/attention_heads.py --run outputs/nanolm/sweeps/hw1_char_models/gpt_modern_s1337 \
-        --out-dir results/part4
-
-For each text it
-  1. draws the maps with nanolm's own `viz attention` code (same as
-     `python -m nanolm.viz attention --run <run> --text "..."`, but saved into --out-dir instead of
-     overwriting docs/nanolm_figs/p1_attention_maps.png), and
-  2. measures, for every layer x head, the average attention weight that a query position t puts on:
-       prev        position t-1                          (previous-token head)
-       self        position t
-       word_start  first letter of the current word      (only t with t - start >= 2, so it is not prev/self)
-       line_mark   the last ':' or newline before t      (only when t - pos >= 2)
-       first       position 0                            (attention sink; t >= 2)
-       induction   t - P + 1, the token AFTER the previous copy of x_t  (only for the 'repeat' text, period P)
-     plus the mean look-back distance sum_s A[t,s] (t - s).
-     Each pattern is also given its chance level: the mean of 1/(t+1) over the same query positions,
-     i.e. what a head that spreads its weight uniformly over the visible prefix would score.
-
-Outputs: attn_<kind>.png, head_stats_<kind>.csv, head_stats.md (all texts, + a 'best head per pattern' table).
-"""
+"""Part 4: attention maps (nanolm.viz attention) on three texts, and the average attention weight on the
+relevant position for every head (head_stats.md)."""
 from __future__ import annotations
 
 import argparse
@@ -130,7 +110,6 @@ def main():
         maps = viz.attention_maps(model, torch.tensor([ids]))
         period = len(REPEAT_UNIT) if kind == "repeat" else None
         df, pats = head_stats(maps, text, period)
-        df.to_csv(out / f"head_stats_{kind}.csv", index=False)
 
         md += [f"### {kind}  ({len(text)} chars)", "", "```", text, "```", ""]
         hdr = "| head | " + " | ".join(pats) + " | look-back (chars) |"
@@ -160,7 +139,7 @@ def main():
         md.append(f"| {r['text']} | {r['pattern']} | {r['best head']} | {r['weight']:.3f} | {r['chance']:.3f} | "
                   f"{r['x chance']:.1f} |")
     (out / "head_stats.md").write_text("\n".join(md) + "\n")
-    print(f"\nwrote {out}/attn_*.png, head_stats_*.csv, head_stats.md")
+    print(f"\nwrote {out}/attn_*.png, head_stats.md")
 
 
 if __name__ == "__main__":

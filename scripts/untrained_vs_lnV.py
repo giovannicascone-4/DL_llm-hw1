@@ -1,11 +1,4 @@
-"""HW1 part 1b: loss of an untrained model vs ln V, for each tokenizer.
-
-    python ../../../hw1/scripts/untrained_vs_lnV.py outputs/nanolm/sweeps/hw1_untrained --out results/part1_untrained.md
-
-A model that knows nothing gives every token probability 1/V, so its loss is ln V nats/token and
-its bpb is log2(V) x tokens/byte. A fresh model should start close to (slightly above) ln V.
-V is read from the run's checkpoint (data_meta.vocab_size); falls back to the '[data] ... vocab=' line in stdout.log.
-"""
+"""Part 1: loss of the untrained models (train.max_steps=1) compared with ln V."""
 from __future__ import annotations
 
 import argparse

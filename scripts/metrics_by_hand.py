@@ -1,13 +1,4 @@
-"""HW1 part 1a: recompute loss, perplexity, bits/token and bits-per-byte from metrics.json by hand.
-
-    python ../../../hw1/scripts/metrics_by_hand.py <run_dir> [--out results/part1_metrics_by_hand.md]
-
-Inputs used (all from the run's metrics.json):
-    val_loss    mean -ln p(target) over the scored tokens        [nats / token]
-    val_tokens  number of scored target tokens N_tok
-    val_bytes   number of UTF-8 bytes those targets cover N_bytes
-Checked against the values the trainer logged: val_ppl, val_bpb (and val_bytes_per_token).
-"""
+"""Part 1: recompute loss, perplexity, bits/token and bpb from metrics.json and compare with the logged values."""
 from __future__ import annotations
 
 import argparse

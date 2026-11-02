@@ -1,12 +1,4 @@
-"""HW1 part 3: bpb vs context length for the LSTM and the modern Transformer.
-
-    python ../../../hw1/scripts/plot_context.py \
-        --char-models outputs/nanolm/sweeps/hw1_char_models \
-        --context outputs/nanolm/sweeps/hw1_context --out-dir results/part3
-
-seq_len=256 comes from the 'lstm' / 'gpt_modern' runs of the char-models sweep (identical config).
-Writes context_bpb.png, context_curves.png, context_table.md, context_summary.csv.
-"""
+"""Part 3: bpb vs. context length for the LSTM and the Transformer (context_bpb.png, context_table.md)."""
 from __future__ import annotations
 
 import argparse
@@ -63,8 +55,6 @@ def main():
     df, cv = load([a.char_models, a.context])
     if df.empty:
         raise SystemExit("no runs found")
-    df[["family", "ctx", "seed", "params", "tokens_seen", "val_loss", "val_bpb", "train_time_sec"]] \
-        .sort_values(["family", "ctx", "seed"]).to_csv(out / "context_summary.csv", index=False)
 
     g = df.groupby(["family", "ctx"])["val_bpb"].agg(["mean", "std", "count"]).reset_index()
     noise = g["std"].dropna().median() if g["std"].notna().any() else float("nan")
@@ -107,25 +97,7 @@ def main():
     fig.savefig(out / "context_bpb.png", dpi=150)
     plt.close(fig)
 
-    # ---- learning curves per (family, ctx)
-    if not cv.empty:
-        fams = sorted(cv["family"].unique())
-        fig, axes = plt.subplots(1, len(fams), figsize=(6 * len(fams), 4.5), sharey=True, squeeze=False)
-        for ax, fam in zip(axes[0], fams):
-            for ctx, c in cv[cv.family == fam].groupby("ctx"):
-                m = c.groupby("train_tokens")["bpb"].mean()
-                ax.plot(m.index / 1e6, m.values, label=f"seq_len {ctx}")
-            ax.set_title(fam)
-            ax.set_xlabel("training tokens seen (millions)")
-            ax.grid(alpha=0.3)
-            ax.legend()
-        axes[0][0].set_ylabel("val bits-per-byte (periodic estimate)")
-        lo = cv["bpb"].min()
-        ax.set_ylim(lo - 0.05, min(cv["bpb"].max(), lo + 1.0))
-        fig.tight_layout()
-        fig.savefig(out / "context_curves.png", dpi=150)
-        plt.close(fig)
-    print(f"\nwrote {out}/context_bpb.png, context_curves.png, context_table.md, context_summary.csv")
+    print(f"\nwrote {out}/context_bpb.png, context_table.md")
 
 
 if __name__ == "__main__":

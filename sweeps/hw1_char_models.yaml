@@ -1,8 +1,4 @@
-# HW1 part 2: RNN vs GRU vs LSTM vs Transformer on Tiny Shakespeare (characters).
-# Identical to nanolm/configs/sweeps/01_char_models.yaml except: eval every 100 steps (smoother curves).
-# Same token budget for every model: max_steps x 32 x 256 tokens (2000 steps = 16.4M chars).
-# Laptop version: lower the budget for ALL runs at once with  --set train.max_steps=1000  (see run_all.sh).
-# No max_time_sec on purpose: a wall-clock cap would give fast models more tokens (unequal budget).
+# Part 2: RNN, GRU, LSTM (x2 sizes) and two Transformers; same 16.4M-token budget, 2 seeds.
 name: hw1_char_models
 base: ../../DeepDataMiningLearning/DeepDataMiningLearning/llm/nanolm/configs/02_char_transformer.yaml
 seeds: [1337, 42]
@@ -18,8 +14,8 @@ runs:
     overrides: {model.arch: gru, model.n_layers: 2, model.dim: 256, train.lr: 2e-3, train.weight_decay: 0.0}
   - name: lstm
     overrides: {model.arch: lstm, model.n_layers: 2, model.dim: 256, train.lr: 2e-3, train.weight_decay: 0.0}
-  - name: lstm_512           # ~parameter-matched to the 4-layer Transformer
+  - name: lstm_512
     overrides: {model.arch: lstm, model.n_layers: 2, model.dim: 512, train.lr: 2e-3, train.weight_decay: 0.0}
-  - name: gpt_textbook       # LayerNorm + learned positions + GELU
-  - name: gpt_modern         # RMSNorm + RoPE + SwiGLU, no bias
+  - name: gpt_textbook
+  - name: gpt_modern
     overrides: {model.norm: rmsnorm, model.pos: rope, model.mlp: swiglu, model.bias: false}
